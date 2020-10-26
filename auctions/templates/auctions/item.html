@@ -1,0 +1,177 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+  <div class="container">
+    <div class="p-3 mb-5 bg-light border">
+      <h4>{{ item.title }}</h4>
+    </div>
+    
+    <div class="row mb-5">
+      <div class="col-md-6">
+      {% if item.image_url is not "" %}
+        <img src="{{ item.image_url }}" class="img-fluid d-block" alt="">
+      {% else %}
+        <p>No Image</p>
+      {% endif %}    
+      </div>
+      <div class="col-md-6">
+        <div class="card">
+          <div class="card-body">
+            <div class="card-text">
+              <p>
+                <span class="font-weight-bold">Category : </span>
+                <span class="text-primary">{{ item.category.title }}</span>
+              </p>
+              <p>
+                <span class="font-weight-bold">Posted By : </span>
+                {% if request.user == item.owner %}
+                  <span class="text-success font-weight-bold">You</span>
+                {% else %}
+                  <span class="text-primary font-weight-bold">{{  item.owner.username|title }}</span>
+                {% endif %} 
+              </p>
+              <p>
+                <span class="font-weight-bold">On : </span>
+                <span class="text-primary">{{  item.created_at  }}</span>    
+              </p>
+              <p>
+                <span class="font-weight-bold">Starting Price : </span>
+                <span class="text-danger font-weight-bold">{{  item.starting_price  }}$</span>    
+              </p>
+              {% if item.open == True %}
+                {% if bid is not None %}
+                  <p>
+                    <span class="font-weight-bold">Last Bid By : </span>
+                    {% if item.bid.bidder == request.user %}
+                      <span class="text-success font-weight-bold">You</span>
+                    {% else %}
+                      <span class="text-primary font-weight-bold">{{ item.bid.bidder.username|title }}</span>
+                    {% endif %}
+                  </p>
+                  <p>
+                    <span class="font-weight-bold ">Current Price : </span>
+                    <span class="text-primary font-weight-bold text-danger">{{ item.bid.price }}$</span>
+                  </p>
+                {% else %}
+                  <h3 class="font-weight-bold text-danger">No Biddings placed</h3>
+                {% endif %}
+                {% if request.user == item.owner %}
+                  <p>
+                    <form action="{% url 'closebidding' %}" method="POST">
+                      {% csrf_token %}
+                      <input type="hidden" value="{{ item.id }}" name="item_id">
+                      <button type="submit" class="btn btn-danger">Close</button>
+                    </form>
+                  </p>
+                {% elif request.user.is_authenticated %}
+                  <p>
+                    <form action="{% url 'bidprocess' %}" method="POST">
+                      {% csrf_token %}
+                      <input type="hidden" name="item_id" value="{{ item.id }}">
+                      <div class="form-group">
+                        <label for="new_bid">Place a bid</label>
+                        <input type="number" step="0.01" class="form-control" name="new_bid">
+                      </div>
+                      <button type="submit" class="btn btn-primary">Bid</button>
+                    </form>
+                  </p>
+                {% endif %}
+              {% else %}
+                <h3 class="text-danger font-weight-bold">Bidding Closed</h3>
+                {% if bid is not None %}
+                  <p>
+                    <span class="font-weight-bold">Winner : </span>
+                    {% if item.bid.bidder == request.user %}
+                      <span class="text-success font-weight-bold">You</span>
+                    {% else %}
+                      <span class="text-success font-weight-bold">{{ item.bid.bidder.username|title }}</span>
+                    {% endif %}
+                  </p>
+                  <p>
+                    <span class="font-weight-bold">Winning Bid: </span>
+                    <span class="text-danger font-weight-bold">{{ item.bid.price }}$</span>
+                  </p>
+                {% else %}
+                  <h3 class="font-weight-bold text-danger">No Biddings placed</h3>
+                {% endif %}
+
+              {% endif %}
+              <p>
+                {% if watchlist_flag is not None %}
+                  <form action="{% url 'item' item.id %}" method="POST">
+                    {% csrf_token %}
+                      <input type="hidden" value="{{ watchlist_flag }}" name="watchlist_flag">
+                    {% if watchlist_flag == "add" %}
+                      <button type="submit" class="btn btn-success btn-block">Add to Watchlist</button>
+                    {% else %}
+                      <button type="submit" class="btn btn-warning btn-block">Remove from Watchlist</button>
+                    {% endif %}
+                    
+                  </form>
+                {% endif %}
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+  
+    <div class="row">
+      <div class="col">
+        <div class="card">
+          <div class="card-header"> 
+            <h4>Description</h4> 
+          </div>
+          <div class="card-body">
+            <p class="card-text">
+              {{ item.description }}
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {% if user.is_authenticated %}
+      <div class="row">
+        <div class="col">
+          <form action="{% url 'commentprocess' %}" method="POST">
+            <input type="hidden" name="item_id" value="{{ item.id }}">
+            {% csrf_token %}
+            <div class="card my-3">
+              <div class="card-header">
+                <h6>Post a Comment</h4>
+              </div>
+              <div class="card-body">
+                <textarea name="comment-text" class="form-control" cols="30" rows="5"></textarea>
+              </div>
+              <div class="card-footer text-right">
+                <button type="submit" class="btn btn-success">Post</button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    {% endif %}
+
+    {% for comment in comments %}
+      <div class="row">
+        <div class="col">
+          <div class="card my-3">
+            <div class="card-body">
+              <div class="card-text">
+                <p>
+                  <span class="text-primary">{{ comment.owner.username|title }}</span> said on <span class="text-primary font-italic">{{ comment.created_at }}</span>
+                </p>
+                <p>
+                  {{ comment.text }}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  
+
+{% endblock %}

@@ -1,0 +1,11 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+  <div class="container">
+    <h4 class="text-danger">Bidding Failed</h4>
+    <p class="text-danger">
+      Your bidding price must be bigger than the starting price or any other biddings placed
+    </p>
+    <a href="{% url 'item' item_id %}" class="btn btn-dark">Go Back to Item Page</a>
+  </div>
+{% endblock %}

@@ -1,0 +1,37 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+  <div class="container">
+    <div class="row">
+      <div class="col">
+        <div class="card">
+          <div class="card-header">
+            <h3>All Categories</h3>
+          </div>
+          <table class="table table-striped">
+            <thead class="thead-dark">
+              <tr>
+                <th>#</th>
+                <th>Category Name</th>
+                <th>Items Under Category</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for category, count in contents %}
+                <tr>
+                  <td>{{ forloop.counter }}</td>
+                  <td>{{ category.title }}</td>
+                  <td>{{ count }}</td>
+                  <td>
+                    <a href="{% url 'itemlistbycategory' category.id %}" class="btn btn-secondary">Items</a>
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}

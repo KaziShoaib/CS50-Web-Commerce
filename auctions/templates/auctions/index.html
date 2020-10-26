@@ -1,0 +1,56 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+    <div class="container">
+        <h2>{{ page_heading }}</h2>
+        <hr>
+        <div class="row">
+            {% for item, price in contents %}
+                <div class="col-md-4">
+                    <div class="card mb-3">
+                        <div class="card-header">
+                            <h3>{{ item.title }}</h3>
+                        </div>
+                        <img src="{{ item.image_url }}" alt="No Image" class="card-img-top" height="200" width="300">
+                        <div class="card-body">
+                            <p>
+                                <span class="text-dark">Starting Price : </span>
+                                <span class="text-primary">{{ item.starting_price }}$</span>
+                            </p>
+                            {% if price is not None %}
+                                {% if item.open %}
+                                    <h4 class="card-title text-primary">
+                                        Current Price : {{ price }}$
+                                    </h4>
+                                {% else %}
+                                    <h4 class="card-title text-success">
+                                        Winning Price : {{ price }}$
+                                    </h4>
+                                {% endif %}
+                            {% else %}
+                                <h4 class="card-title text-danger">
+                                    No Biddings
+                                </h4>
+                            {% endif %}
+                            <div class="card-text">
+                                <p>
+                                    {{ item.description|slice:70 }}
+                                </p>
+                            </div>
+                        </div>
+                        {% if item.open is True %}
+                        <a class="btn btn-outline-success btn-block" href="{% url 'item' item.id %}">Details (Bidding Open)</a>
+                        {% else %}
+                        <a class="btn btn-outline-danger btn-block" href="{% url 'item' item.id %}">Details (Bidding Closed)</a>
+                        {% endif %}
+                    </div>
+                </div>
+            {% empty %}
+                <div class="col">
+                    <h3>No Items</h3>
+                </div>
+                
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}

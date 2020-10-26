@@ -1,0 +1,8 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+  <div class="container">
+    <h2 class="text-success">Bidding Successful</h2>
+    <a href="{% url 'item' item_id %}" class="btn btn-primary">Go Back to Item Page</a>
+  </div>
+{% endblock %}
